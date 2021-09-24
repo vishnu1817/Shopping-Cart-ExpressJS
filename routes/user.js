@@ -1,41 +1,45 @@
+const { response } = require('express');
 var express = require('express');
 var router = express.Router();
+const productHelpers = require('../helpers/product-helpers');
+const userHelpers = require('../helpers/user-helpers')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  let products = [
-    {
-      name:"IPHONE 11",
-      category:"Mobile",
-      description:"This is a good phone",
-      image:'https://m.media-amazon.com/images/I/81a0mY01LLL._SL1500_.jpg'
-
-    },
-    {
-      name:"One Plus 9R",
-      category:"Mobile",
-      description:"This is a good phone",
-      image:'https://m.media-amazon.com/images/I/61PDbUd1VaL._SL1500_.jpg'
-
-    },
-    {
-      name:"IPHONE 12",
-      category:"Mobile",
-      description:"This is a good phone",
-      image:'https://m.media-amazon.com/images/I/71ZOtNdaZCL._SL1500_.jpg'
-
-    },
-    {
-      name:"One Plus Nord 2",
-      category:"Mobile",
-      description:"This is a good phone",
-      image:'https://m.media-amazon.com/images/I/61TnX0PmqES._SL1500_.jpg'
-
-    }
-
-
-  ]
-  res.render('index', { products,admin:false });
+  let user = req.session.user
+  console.log(user);
+  productHelpers.getAllProducts().then((products) =>{
+    
+    res.render('user/view-products',{products,user});
+  })
+  
 });
+router.get('/login',(req,res)=>{
+  res.render('user/login')
+})
+router.get('/signup',(req,res)=>{
+  res.render('user/signup')
+})
+router.post('/signup',(req,res)=>{
+  userHelpers.doSignup(req.body).then((response)=>{
+    console.log(response)
+  })
+
+})
+router.post('/login',(req,res)=>{
+  userHelpers.doLogin(req.body).then((response)=>{
+    if(response.status){
+      req.session.loggedIn=true
+      req.session.user=response.user
+      res.redirect('/')
+    }else{
+      res.redirect('/login')
+    }
+  })
+})
+router.get('/logout',(req,res)=>{
+  req.session.destroy()
+  res.redirect('/')
+})
 
 module.exports = router;

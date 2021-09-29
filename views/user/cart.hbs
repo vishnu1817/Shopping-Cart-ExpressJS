@@ -21,10 +21,10 @@
           
           <td>
             <button class="cart-item-count mr-3 btn-primary" 
-            onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)">-</button>
+            onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user}}',-1)">-</button>
             <span id="{{this.product._id}}">{{this.quantity}}</span>
             <button class="cart-item-count ml-3 btn-primary" 
-            onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)">+</button>
+            onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user}}',1)">+</button>
           </td>
           <td>
             <button onclick="removeFrom('{{this._id}}','{{this.product._id}}')" class="btn btn-danger">Remove</button>
@@ -36,20 +36,21 @@
     </table>
     <hr>
     <div class="float-right pr-5">
-    <h3 class="float-right mr-5">TOTAL: RS.{{total}}</h3><br>
+    <h3 class="float-right mr-5">TOTAL: RS.<span id="total">{{totalValue}}</span></h3><br>
     <a href="/place-order" class="btn btn-success mt-3" style="width: 100%;"> <b>Place Order</b> </a>
     </div>
   </div>
 </section>
 
 <script>
-  function changeQuantity(cartId,proId,count){
+  function changeQuantity(cartId,proId,userId,count){
     let quantity=parseInt(document.getElementById(proId).innerHTML)
     count=parseInt(count)
 
     $.ajax({
       url:'/change-product-quantity',
       data:{
+        user:userId,
         cart:cartId,
         product:proId,
         count:count,
@@ -61,7 +62,13 @@
           alert('Product Removed from cart')
           location.reload()
         }else{
+          
+          
           document.getElementById(proId).innerHTML=quantity+count
+
+          document.getElementById('total').innerHTML=response.total.$numberDecimal
+
+
         }
        
       }

@@ -3,6 +3,7 @@ var express = require('express');
 const productHelpers = require('../helpers/product-helpers');
 var router = express.Router();
 var productHelper = require('../helpers/product-helpers')
+const adminHelpers = require('../helpers/admin-helpers')
 
 
 /* GET users listing. */
@@ -56,5 +57,15 @@ router.post('/edit-product/:id',(req,res)=>{
       image.mv('./public/product-images/'+id+'.jpg')
     }
   })
+})
+router.get('/orders',async(req,res)=>{
+  let allOrders = await adminHelpers.getAllOrders()
+  res.render("admin/all-orders",{allOrders,adminHeader:true})
+  
+ 
+})
+router.get('/users',async(req,res)=>{
+  let users = await adminHelpers.getAllUsers()
+  res.render("admin/all-users",{users,adminHeader:true})
 })
 module.exports = router;
